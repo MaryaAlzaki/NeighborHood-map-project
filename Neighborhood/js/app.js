@@ -5,7 +5,14 @@
       var map;
       var markers = [];
       //Function to initialize the map within the map div
-
+  var locations = [
+          {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
+          {title: 'Chelsea Loft', location: {lat: 40.7444883, lng: -73.9949465}},
+          {title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
+          {title: 'East Village Hip Studio', location: {lat: 40.7281777, lng: -73.984377}},
+          {title: 'TriBeCa Artsy Bachelor Pad', location: {lat: 40.7195264, lng: -74.0089934}},
+          {title: 'Chinatown Homey Space', location: {lat: 40.7180628, lng: -73.9961237}}
+        ];//end of lcations array
       function initMap() {
         var mapCanvus=document.getElementById('map');
          var mapOptions={
@@ -15,25 +22,10 @@
         map = new google.maps.Map(mapCanvus,mapOptions);
         //map constructor
 
-        var locations = [
-          {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
-          {title: 'Chelsea Loft', location: {lat: 40.7444883, lng: -73.9949465}},
-          {title: 'Union Square Open Floor Plan', location: {lat: 40.7347062, lng: -73.9895759}},
-          {title: 'East Village Hip Studio', location: {lat: 40.7281777, lng: -73.984377}},
-          {title: 'TriBeCa Artsy Bachelor Pad', location: {lat: 40.7195264, lng: -74.0089934}},
-          {title: 'Chinatown Homey Space', location: {lat: 40.7180628, lng: -73.9961237}}
-        ];//end of lcations array
+      
         var largeInfowindow = new google.maps.InfoWindow();
         var bounds = new google.maps.LatLngBounds();
 
-function hideAndShow(){
-  for (var i = 0; i < locations.length; i++) {
-    var name="bt"+i;
-    var listLocation=document.getElementById("name").addListener(click,toggleBounce);
-    console.log(listLocation);
-
-  }
-}
         // The following group uses the location array to create an array of markers on initialize.
         for (var i = 0; i < locations.length; i++) {
           // Get the position from the location array.
@@ -89,9 +81,20 @@ function hideAndShow(){
         }
 
       }
-      function viewModel(){
+      
+        var viewModel=function(){
+          var self=this;
+          self.locatioList=ko.observableArray(locations);
+          self.locatioList().forEach(function(locations){
+            locations.visible=ko.observable(true);
+          });
+          self.myObservableString=ko.observable('');
 
-        this.location=[   {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
-];
-      }
-      ko.applyBindings(new viewModel());
+          self.doSomthing=ko.computed(function(){
+            self.myObservableString();
+          });
+
+        };
+        var vm=new viewModel();
+        ko.applyBindings(vm);
+     
