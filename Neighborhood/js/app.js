@@ -4,6 +4,8 @@
 
       var map;
       var markers = [];
+        var marker;
+
       //Function to initialize the map within the map div
   var locations = [
           {title: 'Park Ave Penthouse', location: {lat: 40.7713024, lng: -73.9632393}},
@@ -14,6 +16,7 @@
           {title: 'Chinatown Homey Space', location: {lat: 40.7180628, lng: -73.9961237}}
         ];//end of lcations array
       function initMap() {
+        
         var mapCanvus=document.getElementById('map');
          var mapOptions={
           center: {lat: 40.7413549, lng: -73.9980244},
@@ -30,10 +33,11 @@
         for (var i = 0; i < locations.length; i++) {
           // Get the position from the location array.
           var position = locations[i].location;
+          console.log(position);
           var title = locations[i].title;
           
           // Create a marker per location, and put into markers array.
-          var marker = new google.maps.Marker(
+           marker = new google.maps.Marker(
           {
             map: map,
             position: position,
@@ -45,12 +49,22 @@
           );//End of marker object
           // Push the marker to our array of markers.
           markers.push(marker);
+
+
          
           // Create an onclick event to open an infowindow at each marker.
-          marker.addListener('click', function() { populateInfoWindow(this, largeInfowindow); });
+          marker.addListener('click', function() { populateInfoWindow(this, largeInfowindow); },function(){
+
+          });
            //markers.addListener('click',function(){ toggleBounce(this)});
           bounds.extend(markers[i].position);
           }//End for loop
+          console.log("markers");
+          console.log(markers);
+           console.log("locations");
+           console.log(locations);
+           console.log("marker");
+           console.log(marker);
   
 
         // Extend the boundaries of the map for each marker
@@ -62,7 +76,7 @@
         } else {
           markers.setAnimation(google.maps.Animation.BOUNCE);
         }
-      }
+      }//End of initmap
    
       // This function populates the infowindow when the marker is clicked. We'll only allow
       // one infowindow which will open at the marker that is clicked, and populate based
@@ -79,22 +93,61 @@
             infowindow.setMarker = null;
           });
         }
+        // Foursquare API Client
+        /*var CLIENTID="5V4BL3MFZP4LNOC4FGP21GU044G3P5RIT4IDTNBRMNV0ICPV";
+        var CLIENTSECRET="DXRDJE1H1Q0QME5IO5AHJIHVWZV1DPB1WLX3IO23XQ5ILM4L";
+        //Foursquare URL
+        var APIURL='https://api.foursquare.com/v2/venues/search?ll=' +
+                markers.lat + ',' + markers.lng + '&client_id=' + clientID +
+                '&client_secret=' + clientSecret + '&query=' + markers.title +
+                '&v=20170708' + '&m=foursquare';
+        console.log(APIURL);
+*/
 
       }
-      
+     
         var viewModel=function(){
           var self=this;
-          self.locatioList=ko.observableArray(locations);
-          self.locatioList().forEach(function(locations){
-            locations.visible=ko.observable(true);
-          });
-          self.myObservableString=ko.observable('');
+          var searchterm=ko.observable("");
+         
+          
 
-          self.doSomthing=ko.computed(function(){
-            self.myObservableString();
-          });
+          self.locatioList=ko.observableArray(locations);
+
+          self.locatioList().forEach(
+            function(locations){locations.visible=ko.observable(true); });
+          
+          
+          //self.myObservableString=ko.observable('');
+       self.locatioList=ko.computed(function(){
+            var result=[];
+            var locationToCheck;
+            for(var i=0;i<locations.length; i++){
+              locationToCheck=locations[i].title;
+              console.log(locations.length);
+              console.log(locationToCheck);
+              if(locationToCheck.toLowerCase().includes(this.searchterm().toLowerCase())){
+                result.push(locationToCheck);
+                this.marker[i].setVisible(true);
+              }
+              else{
+                this.marker[i].setVisible(false);
+                result.push(locationToCheck);
+                console.log(result.title);
+              }
+
+            }
+             this.searchterm=ko.observable(result);
+              return result;
+          },this);
+         
+
+          self.doSomthing=ko.computed(function(){ self.myObservableString(); });
 
         };
+
         var vm=new viewModel();
         ko.applyBindings(vm);
+
+
      
